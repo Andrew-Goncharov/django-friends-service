@@ -1,6 +1,8 @@
 from typing import Optional, List, OrderedDict
 from uuid import UUID
 
+from rest_framework.exceptions import ValidationError
+
 from .models import User, Friend, FriendshipRequest
 
 
@@ -8,7 +10,7 @@ def accept_both_requests(user_1: User, user_2: User) -> None:
     request_1 = FriendshipRequest.objects.filter(sender=user_1, receiver=user_2).get()
     request_2 = FriendshipRequest.objects.filter(sender=user_1, receiver=user_2).get()
     if request_1.status != "P" or request_2.status != "P":
-        raise ValueError("Cannot accept non-pending friendship request")
+        raise ValidationError("Cannot accept non-pending friendship request")
     else:
         Friend.objects.create(friend_1=user_1, friend_2=user_2)
         request_1.status = "A"
@@ -78,22 +80,27 @@ def is_valid_uuid(value) -> bool:
     try:
         UUID(str(value))
         return True
-    except ValueError:
+    except ValidationError:
         return False
 
 
+class FriendshipStatus:
+    FRIENDS = "friends"
+    NOT_FRIENDS = "not_friends"
+    REQUEST_SENT = "request_sent"
+    REQUEST_RECEIVED = "request_received"
+
+
 def get_status(user_1: User, user_2: User) -> str:
-    if user_1 == user_2:
-        return "the same user"
-    elif Friend.objects.filter(friend_1=user_1, friend_2=user_2).exists() or \
+    if Friend.objects.filter(friend_1=user_1, friend_2=user_2).exists() or \
             Friend.objects.filter(friend_1=user_2, friend_2=user_1).exists():
-        return "friends"
-    elif FriendshipRequest.objects.filter(sender=user_1, receiver=user_2):
-        return "the request sent by the current user"
-    elif FriendshipRequest.objects.filter(sender=user_2, receiver=user_1):
-        return "the request is received by the current user"
+        return FriendshipStatus.FRIENDS
+    elif FriendshipRequest.objects.filter(sender=user_1, receiver=user_2).exists():
+        return FriendshipStatus.REQUEST_SENT
+    elif FriendshipRequest.objects.filter(sender=user_2, receiver=user_1).exists():
+        return FriendshipStatus.REQUEST_RECEIVED
     else:
-        return "no friendship"
+        return FriendshipStatus.NOT_FRIENDS
 
 
 def get_friendship_status(user_1: User, user_2: User) -> str:
@@ -117,20 +124,18 @@ def get_friendship_status(user_1: User, user_2: User) -> str:
 
 def create_friendship_request(sender: User, receiver: User) -> None:
     if sender == receiver:
-        raise ValueError("Cannot send friend request to yourself")
+        raise ValidationError("Cannot send friend request to yourself")
     elif request_exists(sender, receiver):
-        raise ValueError("FriendshipRequest already exists")
+        raise ValidationError("FriendshipRequest already exists")
     elif already_friends(sender, receiver):
-        raise ValueError("Current users are already friends")
-    # elif get_friendship_status(sender, receiver) != "no friendship":
-    #     raise ValueError("Friendship or FriendshipRequest already exists")
+        raise ValidationError("Current users are already friends")
     else:
         FriendshipRequest.objects.create(sender=sender, receiver=receiver)
 
 
 def accept_friendship_request(request: FriendshipRequest) -> None:
     if request.status != "P":
-        raise ValueError("Cannot accept non-pending friendship request")
+        raise ValidationError("Cannot accept non-pending friendship request")
     else:
         Friend.objects.create(friend_1=request.sender, friend_2=request.receiver)
         request.status = "A"
@@ -139,7 +144,7 @@ def accept_friendship_request(request: FriendshipRequest) -> None:
 
 def reject_friendship_request(request: FriendshipRequest) -> None:
     if request.status != "P":
-        raise ValueError("Cannot reject non-pending request")
+        raise ValidationError("Cannot reject non-pending request")
     else:
         request.status = "R"
         request.save()
