@@ -9,10 +9,12 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import logging
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from corsheaders.defaults import default_headers
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -25,8 +27,16 @@ SECRET_KEY = 'django-insecure-6169*5#&xrnen9))9ig$#074aa)nrcj@somxli2a69%pa-0=_o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
+if not DEBUG:
+    logging.info("Debugging is not enabled.")
+    ALLOWED_HOSTS = ["*"]
+    LOG_LEVEL = "ERROR"
+else:
+    logging.info("Debugging is enabled.")
+    ALLOWED_HOSTS = ["*"]
+    LOG_LEVEL = "DEBUG"
 
 # Application definition
 
@@ -37,12 +47,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',
+    'users'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -121,3 +135,48 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging settings
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "formatters": {
+#         "console": {
+#             "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
+#         },
+#     },
+#     "handlers": {
+#         "console": {
+#             "class": "logging.StreamHandler",
+#             "formatter": "console",
+#         },
+#         # "file": {
+#         #     "class": "logging.FileHandler",
+#         #     "filename": "logs/debug.log",
+#         #     "formatter": "console",
+#         # },
+#     },
+#     "loggers": {
+#         "": {
+#             "level": LOG_LEVEL,
+#             "handlers": ["console"],
+#         },
+#     },
+# }
+#
+# logging.config.dictConfig(LOGGING)
+
+# CORS configuration
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "observe",
+]
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:4200",
+]
+CORS_ORIGIN_REGEX_WHITELIST = [
+    "http://localhost:4200",
+]
