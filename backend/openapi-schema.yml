@@ -28,7 +28,7 @@ paths:
                   nullable: false
       responses:
         '201':
-          description: Successful operation
+          description: Successfully created
         '400':
           description: Invalid input
   /create_friendship_request/:
@@ -54,10 +54,10 @@ paths:
                   format: uuid
                   nullable: false
                   description: User identifier
-                  example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+                  example: "0eaa7a28-6aa6-4924-b1a9-6ab82c12e299"
       responses:
         '201':
-          description: Successful operation
+          description: Successfully created
         '400':
           description: Invalid input
         '404':
@@ -86,7 +86,7 @@ paths:
                   format: uuid
                   nullable: false
                   description: User identifier
-                  example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+                  example: "0eaa7a28-6aa6-4924-b1a9-6ab82c12e299"
                 action:
                   description: action
                   type: string
@@ -95,7 +95,7 @@ paths:
                     - reject
                   nullable: false
       responses:
-        '201':
+        '200':
           description: Successful operation
         '400':
           description: Invalid input
@@ -103,17 +103,17 @@ paths:
           description: User not found
   /get_friendship_requests/:
     get:
-      summary: Accept or reject friendship request
+      summary: Get all sent and received requests
       parameters:
         - in: query
           name: user_id
           schema:
             type: string
             format: uuid
-          description: user id
+          description: User identifier
       responses:
         '200':
-          description: Get friendship request
+          description: Successful operation
           content:
             application/json:
               schema:
@@ -126,12 +126,124 @@ paths:
                     type: array
                     items:
                       type: string
+                      format: uuid
+                      nullable: false
+                      description: User identifier
+                      example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
                   received_requests:
                     type: array
                     items:
                       type: string
+                      format: uuid
+                      nullable: false
+                      description: User identifier
+                      example: "0eaa7a28-6aa6-4924-b1a9-6ab82c12e299"
         '400':
           description: Invalid input
         '404':
           description: User not found
+  /get_friendship_status/:
+    get:
+      summary: Get a status about the relationship between the two users
+      parameters:
+        - in: query
+          name: user_id_1
+          schema:
+            type: string
+            format: uuid
+            nullable: false
+            example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+          description: First user identifier
+        - in: query
+          name: user_id_2
+          schema:
+            type: string
+            format: uuid
+            nullable: false
+            example: "0eaa7a28-6aa6-4924-b1a9-6ab82c12e299"
+          description: Second user identifier
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    description: status
+                    type: string
+                    enum:
+                      - friends
+                      - not_friends
+                      - request_sent
+                      - request_received
+                    nullable: False
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found
+  /get_user_friends/:
+    get:
+      summary: Get user's friend identifiers
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+            format: uuid
+            nullable: false
+            example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+          description: user id
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - friends
+                properties:
+                  friends:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+                      nullable: false
+                      description: User identifier
+                      example: "0eaa7a28-6aa6-4924-b1a9-6ab82c12e299"
 
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found
+  /remove_from_friends/:
+    delete:
+      summary: Remove spicific user from friends
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+            format: uuid
+            nullable: false
+            example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+          description: User identifier
+        - in: query
+          name: friend_id
+          schema:
+            type: string
+            format: uuid
+            nullable: false
+            example: "0eaa7a28-6aa6-4924-b1a9-6ab82c12e299"
+          description: Friend identifier
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found

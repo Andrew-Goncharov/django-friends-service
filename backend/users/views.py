@@ -1,16 +1,14 @@
-from django.shortcuts import render
 from rest_framework import status
-from rest_framework.exceptions import NotFound, ValidationError
-
-from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.response import Response
 
-from .serializers import UserSerializer, FriendshipRequestSerializer, ProcessFriendshipRequestSerializer, \
-    FriendSerializer
-from .actions import user_exists, get_user_by_id, create_friendship_request, get_friendship_request, \
+from .actions import get_user_by_id, create_friendship_request, get_friendship_request, \
     accept_friendship_request, reject_friendship_request, is_valid_uuid, get_status, \
     get_user_friends, get_friends_list, get_sent_requests, get_received_requests, get_requests_list, \
     remove_from_friends, clear_friendship_requests, requests_from_both_users_exist, accept_both_requests
+from .serializers import UserSerializer, FriendshipRequestSerializer, ProcessFriendshipRequestSerializer, \
+    FriendSerializer
 
 
 @api_view(["POST"])
