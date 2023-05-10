@@ -136,37 +136,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Logging settings
-
-# LOGGING = {
-#     "version": 1,
-#     "disable_existing_loggers": False,
-#     "formatters": {
-#         "console": {
-#             "format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s",
-#         },
-#     },
-#     "handlers": {
-#         "console": {
-#             "class": "logging.StreamHandler",
-#             "formatter": "console",
-#         },
-#         # "file": {
-#         #     "class": "logging.FileHandler",
-#         #     "filename": "logs/debug.log",
-#         #     "formatter": "console",
-#         # },
-#     },
-#     "loggers": {
-#         "": {
-#             "level": LOG_LEVEL,
-#             "handlers": ["console"],
-#         },
-#     },
-# }
-#
-# logging.config.dictConfig(LOGGING)
-
 # CORS configuration
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
