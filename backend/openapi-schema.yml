@@ -1,0 +1,137 @@
+openapi: 3.0.3
+info:
+  title: Swagger Friends Service - OpenAPI 3.0
+  description: ''
+  version: '1.0'
+paths:
+  /create_user/:
+    post:
+      summary: Create new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - username
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  nullable: false
+                  description: Unique identifier
+                  example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+                username:
+                  description: Username
+                  type: string
+                  nullable: false
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid input
+  /create_friendship_request/:
+    post:
+      summary: Create friendship request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sender
+                - receiver
+              properties:
+                sender:
+                  type: string
+                  format: uuid
+                  nullable: false
+                  description: User identifier
+                  example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+                receiver:
+                  type: string
+                  format: uuid
+                  nullable: false
+                  description: User identifier
+                  example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found
+  /process_friendship_request/:
+    post:
+      summary: Accept or reject friendship request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sender
+                - receiver
+                - action
+              properties:
+                sender:
+                  type: string
+                  format: uuid
+                  nullable: false
+                  description: User identifier
+                  example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+                receiver:
+                  type: string
+                  format: uuid
+                  nullable: false
+                  description: User identifier
+                  example: "3fa85f64-5717-4562-b3fc-2c963f66a333"
+                action:
+                  description: action
+                  type: string
+                  enum:
+                    - accept
+                    - reject
+                  nullable: false
+      responses:
+        '201':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found
+  /get_friendship_requests/:
+    get:
+      summary: Accept or reject friendship request
+      parameters:
+        - in: query
+          name: user_id
+          schema:
+            type: string
+            format: uuid
+          description: user id
+      responses:
+        '200':
+          description: Get friendship request
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - sent_requests
+                  - received_requests
+                properties:
+                  sent_requests:
+                    type: array
+                    items:
+                      type: string
+                  received_requests:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Invalid input
+        '404':
+          description: User not found
+

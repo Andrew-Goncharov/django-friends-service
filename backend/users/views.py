@@ -43,7 +43,6 @@ def create_friendship_request_view(request):
         accept_both_requests(sender, receiver)
 
     return Response(
-        data={"message": "FriendshipRequest successfully created"},
         status=status.HTTP_201_CREATED
     )
 
